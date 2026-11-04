@@ -45,13 +45,19 @@ SCHEDULE_DIR = DATA_DIR+'schedule/'
 CACHE = Path(DATA_DIR+'cache/')
 ASSET_DIR = DATA_DIR + 'assets/'
 RAW_DIR = DATA_DIR + 'raw/'
-
+PREDICTION_DIR = DATA_DIR + 'predictions/'
+PREDICTION_ARCHIVE_DIR = PREDICTION_DIR + 'archive/'
 PRESEASON_OVERUNDERS = RAW_DIR + '2026_preseason_ou.csv'
 
 # file names
 SCHEDULE_FILE = SCHEDULE_DIR + 'schedule.csv'
 PAST_FILE = SCHEDULE_DIR + 'past.csv'
 FUTURE_FILE = SCHEDULE_DIR + 'future.csv'
+
+MARGIN_PREDICTIONS_FILE = PREDICTION_DIR + 'predicted_margins.csv'
+
+weekly_srs_file = SRS_DIR + f'{CURRENT_SEASON}_weekly_srs.csv'
+weekly_hfa_file = SRS_DIR + f'{CURRENT_SEASON}_weekly_hfa.csv'
 
 current_week = pd.read_csv(PAST_FILE)['week'].max()
 SRS_DATA_FILE = SRS_DIR + f'week{current_week}_team_srs_data.csv'

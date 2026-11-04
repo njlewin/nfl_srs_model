@@ -119,3 +119,4 @@ season,week,gameday,home_team,away_team,home_score,away_score,game_type,actual_m
 2026,8,2026-11-01,DEN,KC,28.0,24.0,REG,4.0,Home,0,0,DEN
 2026,8,2026-11-01,MIA,NE,19.0,24.0,REG,-5.0,Home,0,0,NE
 2026,8,2026-11-01,WAS,PHI,27.0,10.0,REG,17.0,Home,0,0,WAS
+2026,8,2026-11-02,SEA,CHI,17.0,34.0,REG,-17.0,Home,0,0,CHI

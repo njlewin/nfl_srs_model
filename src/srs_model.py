@@ -57,12 +57,10 @@ def od_srs_rankings(df, season):
 
     osrs = solution[:n_teams]
     dsrs = solution[DEF_OFFSET:DEF_OFFSET + n_teams]
-    league_avg = solution[AVG_COL]
     hfa = solution[HFA_COL]
 
-    # Recenter offense and defense to average zero, moving the shifts into
-    # the league average so every prediction stays the same
-    league_avg += osrs.mean() - dsrs.mean()
+    # Recenter offense and defense to average zero. Predictions would only stay
+    # the same with an offsetting shift in the league average, which isn't returned.
     osrs = osrs - osrs.mean()
     dsrs = dsrs - dsrs.mean()
 
@@ -79,12 +77,11 @@ def od_srs_rankings(df, season):
 def get_observed_srs(df):
     """Calculate cumulative SRS by week and the per-game error of the latest fit.
 
-    Writes the weekly SRS and hfa results to CSVs in SRS_DIR. The error
-    calculation reads the module-level `past` dataframe rather than df.
+    Writes the weekly SRS and hfa results to CSVs in SRS_DIR.
 
     Args:
-        df: Game results with a week column plus the columns required by
-            od_srs_rankings.
+        df: Game results with week and actual_margin columns plus the columns
+            required by od_srs_rankings.
 
     Returns:
         A tuple of (srs, sigma). srs is the SRS table through the latest week
@@ -107,8 +104,8 @@ def get_observed_srs(df):
     srs_weekly = pd.concat(srs_list).reset_index(drop = True)
     hfa_weekly = pd.DataFrame(hfa_list).T.reset_index()
     hfa_weekly.columns = ['week', 'hfa']
-    srs_weekly.to_csv(SRS_DIR+f'{CURRENT_SEASON}_weekly_srs.csv', index = False)
-    hfa_weekly.to_csv(SRS_DIR + f'/{CURRENT_SEASON}_weekly_hfa.csv', index = False)
+    srs_weekly.to_csv(weekly_srs_file, index = False)
+    hfa_weekly.to_csv(weekly_hfa_file, index = False)
 
     # The last week's fit uses all games played, so it's the current result
     srs = srs_t.copy()
@@ -117,7 +114,7 @@ def get_observed_srs(df):
 
     # Predict each game's margin from the current ratings. Sigma is therefore
     # in-sample: these ratings were fit on the same games they're predicting.
-    merge1 = past.merge(srs[['team', 'srs_obs']], left_on=['home_team'], right_on=['team']).drop(columns=['team']).rename(
+    merge1 = df.merge(srs[['team', 'srs_obs']], left_on=['home_team'], right_on=['team']).drop(columns=['team']).rename(
         columns={'srs_obs': 'home_srs'})
     past_pred = merge1.merge(srs[['team', 'srs_obs']], left_on=['away_team'], right_on=['team']).drop(
         columns=['team']).rename(columns={'srs_obs': 'away_srs'})
@@ -151,6 +148,9 @@ def add_prior_srs(srs):
     df_ous['srs'] = (df_ous['wins_ou'] - df_ous['wins_ou'].mean()) * SLOPE
     prior_srs_dict = pd.Series(df_ous.srs.values, index=df_ous.team).to_dict()
     srs['srs_prior'] = srs['team'].apply(lambda x: prior_srs_dict.get(x))
+    missing = srs.loc[srs['srs_prior'].isna(), 'team'].tolist()
+    if missing:
+        raise ValueError(f'No preseason over/under found for: {missing}')
     return srs
 
 
@@ -189,6 +189,7 @@ srs = add_posterior_srs(srs, sigma, TAU)
 
 # Add team logos and write the final table
 teams = nfl.load_teams().select(["team_abbr", "team_logo_espn"]).to_pandas()
+srs['sigma_obs'] = sigma
 srs = srs.merge(teams, left_on="team", right_on="team_abbr", how="left").drop(columns = 'team_abbr')
-week = past['week'].max()
 srs.to_csv(SRS_DATA_FILE, index = False)
+
