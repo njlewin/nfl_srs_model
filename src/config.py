@@ -33,8 +33,8 @@ for conference in ['AFC', 'NFC']:
     conferences[conference] = [team for key, teams in DIVISIONS.items() if conference in key for team in teams]
 
 # Derived lookups
-DIV_LOOKUP = {t: d for d, teams in DIVISIONS.items() for t in teams}
-CONF_LOOKUP = {t: d.split()[0] for t, d in DIV_LOOKUP.items()}
+div_lookup = {t: d for d, teams in DIVISIONS.items() for t in teams}
+conf_lookup = {t: d.split()[0] for t, d in div_lookup.items()}
 
 # Directories
 
@@ -53,7 +53,7 @@ PRESEASON_OVERUNDERS = RAW_DIR + '2026_preseason_ou.csv'
 SCHEDULE_FILE = SCHEDULE_DIR + 'schedule.csv'
 PAST_FILE = SCHEDULE_DIR + 'past.csv'
 FUTURE_FILE = SCHEDULE_DIR + 'future.csv'
-
+RECORDS_FILE = SCHEDULE_DIR + 'records.csv'
 MARGIN_PREDICTIONS_FILE = PREDICTION_DIR + 'predicted_margins.csv'
 
 weekly_srs_file = SRS_DIR + f'{CURRENT_SEASON}_weekly_srs.csv'

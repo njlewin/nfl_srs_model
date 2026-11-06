@@ -51,6 +51,9 @@ hfa_post =(games_obs*hfa_obs+games_prior*hfa_prior)/(games_obs+games_prior)
 sigma_obs = srs['sigma_obs'].iloc[0]
 views = ['prior', 'obs', 'post']
 
+future[f'{team}_std_prior'] = TAU
+future[f'{team}_std_obs'] = sigma_obs
+
 # Map games played for eahc home and away team
 games_played = pd.concat([past['home_team'], past['away_team']]).value_counts()
 future['home_games_played'] = future['home_team'].map(games_played).fillna(0).astype(int)
