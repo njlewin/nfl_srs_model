@@ -59,16 +59,15 @@ games_prior = 256
 # Home field advantage: blend this season's observed HFA with the prior,
 # weighted by the number of games behind each
 hfa_df  = pd.read_csv(weekly_hfa_file)
-hfa_obs = hfa_df.loc[hfa_df['week'] == current_week, 'hfa'].iloc[0]
-hfa_prior = PRIOR_HFA           # Prior HFA is from 2025 data
-hfa_post =(games_obs*hfa_obs+games_prior*hfa_prior)/(games_obs+games_prior)
+future['hfa_obs'] = hfa_df.loc[hfa_df['week'] == current_week, 'hfa'].iloc[0]
+future['hfa_prior'] = PRIOR_HFA           # Prior HFA is from 2025 data
+future['hfa_post'] =(games_obs*future['hfa_obs']+games_prior*future['hfa_prior'] )/(games_obs+games_prior)
 
 # Game-level noise: std dev of actual margins around SRS-predicted margins
 sigma_obs = srs['sigma_obs'].iloc[0]
 views = ['prior', 'obs', 'post']
 
-future[f'{team}_std_prior'] = TAU
-future[f'{team}_std_obs'] = sigma_obs
+
 
 # Count games played so far by each home and away team
 games_played = pd.concat([past['home_team'], past['away_team']]).value_counts()
@@ -90,13 +89,15 @@ for team in ['home', 'away']:
         lambda row: np.sqrt(1/(row[f'{team}_games_played']/sigma_obs**2 + 1/TAU**2)),
         axis = 1
     )
+    future[f'{team}_std_prior'] = TAU
+    future[f'{team}_std_obs'] = sigma_obs
 
 
 # Expected home margin for each view:
 #   margin = srs_home - srs_away + HFA (HFA omitted for neutral-site games)
 for view in views:
     future[f'{view}_pred_margin'] = (future[f'home_srs_{view}'] - future[f'away_srs_{view}']
-                                     + (~future['neutral'].astype(bool)) * hfa_post)
+                                     + (~future['neutral'].astype(bool)) * future[f'hfa_{view}'])
 
 # Home win probability for each view
 

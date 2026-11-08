@@ -36,6 +36,8 @@ for conference in ['AFC', 'NFC']:
 div_lookup = {t: d for d, teams in DIVISIONS.items() for t in teams}
 conf_lookup = {t: d.split()[0] for t, d in div_lookup.items()}
 
+VIEWS = ['prior', 'obs', 'post']
+
 # Directories
 
 DATA_DIR = "../data/"
@@ -60,4 +62,5 @@ weekly_srs_file = SRS_DIR + f'{CURRENT_SEASON}_weekly_srs.csv'
 weekly_hfa_file = SRS_DIR + f'{CURRENT_SEASON}_weekly_hfa.csv'
 
 current_week = pd.read_csv(PAST_FILE)['week'].max()
-SRS_DATA_FILE = SRS_DIR + f'week{current_week}_team_srs_data.csv'
+SRS_DATA_FILE = SRS_DIR + f'team_srs_data.csv'
+LAST_UPDATED_FILE = DATA_DIR + 'last_updated.csv'

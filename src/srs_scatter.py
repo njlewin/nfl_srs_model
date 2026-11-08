@@ -60,4 +60,4 @@ ax.set_title(f"{season} NFL Offensive vs Defensive SRS")
 
 plt.tight_layout()
 plt.savefig(ASSET_DIR + "nfl_srs_logo_scatter.png", dpi=200)
-plt.show()
+#plt.show()
