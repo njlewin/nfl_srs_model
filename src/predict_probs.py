@@ -67,8 +67,6 @@ future['hfa_post'] =(games_obs*future['hfa_obs']+games_prior*future['hfa_prior']
 sigma_obs = srs['sigma_obs'].iloc[0]
 views = ['prior', 'obs', 'post']
 
-
-
 # Count games played so far by each home and away team
 games_played = pd.concat([past['home_team'], past['away_team']]).value_counts()
 future['home_games_played'] = future['home_team'].map(games_played).fillna(0).astype(int)
@@ -83,44 +81,36 @@ for team in ['home', 'away']:
         'srs_obs':f'{team}_srs_obs',
         'srs_post':f'{team}_srs_post'}
     ).drop(columns = ['team'])
-    # Posterior std dev of the team's rating (normal-normal update): shrinks
-    # from TAU toward 0 as the team plays more games
+    # Posterior std dev of the team's rating (normal-normal update): starts at
+    # TAU and shrinks toward 0 as the team plays more games
     future[f'{team}_std_post'] = future.apply(
         lambda row: np.sqrt(1/(row[f'{team}_games_played']/sigma_obs**2 + 1/TAU**2)),
         axis = 1
     )
-    future[f'{team}_std_prior'] = TAU
-    future[f'{team}_std_obs'] = sigma_obs
+
+# Std dev of the predicted home margin for each view
+#   prior: historical game-to-game noise (13.5) plus prior rating uncertainty
+#   obs:   this season's game-level noise plus the standard error for each teams ratings
+#   post:  game-level noise plus the posterior rating uncertainty of each team
+future['prior_std'] = np.sqrt(13.5**2 + 2*TAU**2)
+future['obs_std'] = np.sqrt(sigma_obs**2 + sigma_obs**2/future['home_games_played'] + sigma_obs**2/future['away_games_played'])
+future['post_std'] = np.sqrt(sigma_obs**2+future['home_std_post']**2+future['away_std_post']**2)
 
 
-# Expected home margin for each view:
+# Expected home margin and home win probability for each view:
 #   margin = srs_home - srs_away + HFA (HFA omitted for neutral-site games)
+#   P(home win) = P(margin > 0), with margin ~ Normal(pred_margin, std)
 for view in views:
     future[f'{view}_pred_margin'] = (future[f'home_srs_{view}'] - future[f'away_srs_{view}']
                                      + (~future['neutral'].astype(bool)) * future[f'hfa_{view}'])
 
-# Home win probability for each view
-
-# Posterior: total variance combines game-level noise with the rating
-# uncertainty of each team
-future['post_home_win_prob'] = future.apply(
-    lambda row: get_home_win_prob(row['post_pred_margin'], np.sqrt(sigma_obs**2+row['home_std_post']**2+row['away_std_post']**2)), axis=1
-)
-
-# Prior: prior margin with the prior std dev
-future['prior_home_win_prob'] = future.apply(
-    lambda row: get_home_win_prob(row['prior_pred_margin'], TAU),
-    axis = 1
-)
-
-# Observed: observed margin with game-level noise only
-future['obs_home_win_prob'] = future.apply(
-    lambda row: get_home_win_prob(row['obs_pred_margin'], sigma_obs),
-    axis = 1
-)
+    future[f'{view}_home_win_prob'] = future.apply(
+        lambda row: get_home_win_prob(row[f'{view}_pred_margin'], row[f'{view}_std']), axis=1
+    )
 
 # Predict the upcoming week
 predict_week(future, current_week+1, print_output = True, view ='post')
+predict_week(future, current_week+1, print_output = False, view ='obs')
 
 # Save all margin predictions: once as the current file, once as a dated archive copy
 future.to_csv(MARGIN_PREDICTIONS_FILE, index = False)
