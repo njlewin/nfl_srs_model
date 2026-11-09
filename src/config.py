@@ -10,7 +10,7 @@ TAU = 4.01              # Standard devation of prior results using preseason srs
 SLOPE = 1.79            # Slope of plotting SRS results against preseason wins
 PRIOR_HFA = 2.189285065 # Homefield advantage from 2025
 N_PRIOR = 256           # Games used to calculate prior HFA
-
+G2G_NOISE = 13.5        # Historical game-to-game noise in points.
 #Number of simulations to run
 N_SIMS = 10000
 

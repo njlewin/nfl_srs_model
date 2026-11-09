@@ -1,16 +1,4 @@
 season,week,gameday,home_team,away_team,home_score,away_score,game_type,result,location,playoff,neutral
-2026,9,2026-11-08,CAR,DEN,,,REG,,Home,0,0
-2026,9,2026-11-08,IND,DAL,,,REG,,Home,0,0
-2026,9,2026-11-08,KC,NYJ,,,REG,,Home,0,0
-2026,9,2026-11-08,MIA,DET,,,REG,,Home,0,0
-2026,9,2026-11-08,NO,CLE,,,REG,,Home,0,0
-2026,9,2026-11-08,PHI,NYG,,,REG,,Home,0,0
-2026,9,2026-11-08,WAS,LA,,,REG,,Home,0,0
-2026,9,2026-11-08,LAC,HOU,,,REG,,Home,0,0
-2026,9,2026-11-08,SF,LV,,,REG,,Home,0,0
-2026,9,2026-11-08,NE,GB,,,REG,,Home,0,0
-2026,9,2026-11-08,SEA,ARI,,,REG,,Home,0,0
-2026,9,2026-11-08,CHI,TB,,,REG,,Home,0,0
 2026,9,2026-11-09,MIN,BUF,,,REG,,Home,0,0
 2026,10,2026-11-12,NYG,WAS,,,REG,,Home,0,0
 2026,10,2026-11-15,DET,NE,,,REG,,Neutral,0,1

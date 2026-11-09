@@ -153,5 +153,5 @@ margins = pd.read_csv(MARGIN_PREDICTIONS_FILE)
 srs = pd.read_csv(SRS_DATA_FILE)
 
 # Simulate the rest of the season N_SIMS times using the posterior view
-for view in VIEWS:
+for view in ['post']:
     summary  = simulate_reg_seasons(N_SIMS, margins, wins, srs,records, view)

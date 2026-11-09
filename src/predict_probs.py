@@ -54,14 +54,13 @@ srs = pd.read_csv(SRS_DATA_FILE)
 # Number of games observed this season, and the effective number of games
 # the prior is worth when blending the two
 games_obs = len(past)
-games_prior = 256
 
 # Home field advantage: blend this season's observed HFA with the prior,
 # weighted by the number of games behind each
 hfa_df  = pd.read_csv(weekly_hfa_file)
 future['hfa_obs'] = hfa_df.loc[hfa_df['week'] == current_week, 'hfa'].iloc[0]
 future['hfa_prior'] = PRIOR_HFA           # Prior HFA is from 2025 data
-future['hfa_post'] =(games_obs*future['hfa_obs']+games_prior*future['hfa_prior'] )/(games_obs+games_prior)
+future['hfa_post'] =(games_obs*future['hfa_obs']+N_PRIOR*future['hfa_prior'] )/(games_obs+N_PRIOR)
 
 # Game-level noise: std dev of actual margins around SRS-predicted margins
 sigma_obs = srs['sigma_obs'].iloc[0]
@@ -89,10 +88,10 @@ for team in ['home', 'away']:
     )
 
 # Std dev of the predicted home margin for each view
-#   prior: historical game-to-game noise (13.5) plus prior rating uncertainty
+#   prior: historical game-to-game noise plus prior rating uncertainty
 #   obs:   this season's game-level noise plus the standard error for each teams ratings
 #   post:  game-level noise plus the posterior rating uncertainty of each team
-future['prior_std'] = np.sqrt(13.5**2 + 2*TAU**2)
+future['prior_std'] = np.sqrt(G2G_NOISE**2 + 2*TAU**2)
 future['obs_std'] = np.sqrt(sigma_obs**2 + sigma_obs**2/future['home_games_played'] + sigma_obs**2/future['away_games_played'])
 future['post_std'] = np.sqrt(sigma_obs**2+future['home_std_post']**2+future['away_std_post']**2)
 
