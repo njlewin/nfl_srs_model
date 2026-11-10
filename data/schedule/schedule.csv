@@ -134,7 +134,7 @@ season,week,gameday,home_team,away_team,home_score,away_score,game_type,result,l
 2026,9,2026-11-08,NE,GB,27.0,45.0,REG,-18.0,Home,0,0
 2026,9,2026-11-08,SEA,ARI,17.0,3.0,REG,14.0,Home,0,0
 2026,9,2026-11-08,CHI,TB,27.0,24.0,REG,3.0,Home,0,0
-2026,9,2026-11-09,MIN,BUF,,,REG,,Home,0,0
+2026,9,2026-11-09,MIN,BUF,6.0,23.0,REG,-17.0,Home,0,0
 2026,10,2026-11-12,NYG,WAS,,,REG,,Home,0,0
 2026,10,2026-11-15,DET,NE,,,REG,,Neutral,0,1
 2026,10,2026-11-15,ATL,KC,,,REG,,Home,0,0

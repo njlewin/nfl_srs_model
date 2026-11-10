@@ -134,3 +134,4 @@ season,week,gameday,home_team,away_team,home_score,away_score,game_type,actual_m
 2026,9,2026-11-08,NE,GB,27.0,45.0,REG,-18.0,Home,0,0,GB
 2026,9,2026-11-08,SEA,ARI,17.0,3.0,REG,14.0,Home,0,0,SEA
 2026,9,2026-11-08,CHI,TB,27.0,24.0,REG,3.0,Home,0,0,CHI
+2026,9,2026-11-09,MIN,BUF,6.0,23.0,REG,-17.0,Home,0,0,BUF
