@@ -7,6 +7,8 @@ The updated ratings are used to predict game margins and win probabilities and
 to simulate the rest of the regular season for playoff, division, and top seed
 odds.
 
+Full dashboard of results published [here](https://nfl-srs-forecast.lovable.app/).
+
 ![Offensive vs Defensive SRS](data/assets/nfl_srs_logo_scatter.png)
 
 ## How it works
