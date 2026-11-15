@@ -47,13 +47,24 @@ def norm_pdf(x, mu, sd):
 def norm_cdf(x, mu, sd):
     return 0.5 * (1 + math.erf((x - mu) / (sd * math.sqrt(2))))
 
+# Truncate the normal at 0 (negative scores are impossible) and renormalize so the
+# remaining density still integrates to 1.
+p_nonneg = 1 - norm_cdf(0, mean, std)                              # share of the normal at or above 0
+
+def trunc_pdf(x, mu, sd):
+    return np.where(np.asarray(x) >= 0, norm_pdf(x, mu, sd) / p_nonneg, 0.0)
+
+def trunc_cdf(x, mu, sd):
+    return 0.0 if x < 0 else (norm_cdf(x, mu, sd) - norm_cdf(0, mu, sd)) / p_nonneg
+
 z = (ACTUAL_MIN_SCORED - mean) / std
-p_at_least = 1 - norm_cdf(ACTUAL_MIN_SCORED, mean, std)           # P(score >= actual)
+p_at_least = 1 - trunc_cdf(ACTUAL_MIN_SCORED, mean, std)          # P(score >= actual | score >= 0)
 p_two_sided = 2 * min(p_at_least, 1 - p_at_least)                  # as or more extreme, either direction
+print(f'Share of normal below 0 (removed): {1 - p_nonneg:.1%}')
 print(f'z = {z:.2f} | P(MIN >= {ACTUAL_MIN_SCORED}) = {p_at_least:.1%} | two-sided = {p_two_sided:.1%}')
 
-x = np.linspace(mean - 4 * std, mean + 4 * std, 500)
-y = norm_pdf(x, mean, std)
+x = np.linspace(0, mean + 4 * std, 500)
+y = trunc_pdf(x, mean, std)
 
 fig, ax = plt.subplots(figsize=(10, 5.5))
 ax.plot(x, y, color='#4F2683', lw=2)  # Vikings purple
@@ -64,21 +75,22 @@ ax.axvline(mean, color='#888888', ls='--', lw=1)
 ax.axvline(ACTUAL_MIN_SCORED, color='#222222', lw=2)
 
 ymax = y.max()
-ax.annotate(f'Expected: {mean:.1f}\n(σ = {std:.1f})', xy=(mean, ymax), xytext=(mean - 2.2 * std, ymax * 0.9),
+ax.annotate(f'Expected: {mean:.1f}\n(σ = {std:.1f})', xy=(mean, ymax), xytext=(1, ymax * 0.9),
             fontsize=10, color='#444444', arrowprops=dict(arrowstyle='-', color='#888888'))
 ax.annotate(f'Actual: {ACTUAL_MIN_SCORED}\nz = {z:+.2f}\n{p_at_least:.1%} chance of ≥ {ACTUAL_MIN_SCORED}',
-            xy=(ACTUAL_MIN_SCORED, norm_pdf(ACTUAL_MIN_SCORED, mean, std)),
+            xy=(ACTUAL_MIN_SCORED, trunc_pdf(ACTUAL_MIN_SCORED, mean, std)),
             xytext=(ACTUAL_MIN_SCORED + 0.4 * std, ymax * 0.6), fontsize=10, weight='bold',
             arrowprops=dict(arrowstyle='->', color='#222222'))
 
 ax.set_title(f'MIN points vs GB (Week {OBS_WEEK + 1}): model expectation from data through Week {OBS_WEEK}', fontsize=12)
 ax.set_xlabel('MIN points scored')
-ax.set_ylabel('Probability density')
+ax.set_ylabel('Probability density (normal truncated at 0)')
 ax.set_ylim(bottom=0)
+ax.set_xlim(left=0)
 for s in ('top', 'right'):
     ax.spines[s].set_visible(False)
 ax.grid(axis='y', alpha=0.25)
-ax.legend(frameon=False, loc='upper left')
+ax.legend(frameon=False, loc='upper right')
 fig.tight_layout()
 
 out_path = DATA_DIR + 'predictions/min_week10_score_distribution.png'
