@@ -176,7 +176,14 @@ def add_posterior_srs(srs, sigma_obs, sigma_prior):
         axis = 1
     )
     return srs
-
+def add_stds(srs, sigma_obs, sigma_prior):
+    srs['std_obs'] = sigma_obs
+    srs['std_prior'] = np.sqrt(sigma_prior**2+G2G_NOISE**2)
+    srs['std_post'] = srs.apply(
+        lambda row: np.sqrt(1/(row[f'n_obs']/sigma_obs**2 + 1/TAU**2)),
+        axis = 1
+    )
+    return srs
 
 past = pd.read_csv(PAST_FILE)
 games_played = pd.concat([past['home_team'], past['away_team']]).value_counts()
@@ -186,10 +193,10 @@ srs, sigma = get_observed_srs(past)
 srs['n_obs'] = srs['team'].apply(lambda x: games_played[x])
 srs = add_prior_srs(srs)
 srs = add_posterior_srs(srs, sigma, TAU)
+srs = add_stds(srs, sigma, TAU)
 
 # Add team logos and write the final table
 teams = nfl.load_teams().select(["team_abbr", "team_logo_espn"]).to_pandas()
-srs['sigma_obs'] = sigma
 srs = srs.merge(teams, left_on="team", right_on="team_abbr", how="left").drop(columns = 'team_abbr')
 srs.to_csv(SRS_DATA_FILE, index = False)
 

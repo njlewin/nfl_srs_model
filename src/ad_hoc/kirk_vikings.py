@@ -20,6 +20,8 @@ hfa_data = pd.read_csv(weekly_hfa_file)
 hfa = hfa_data[hfa_data['week'] == OBS_WEEK]['hfa'].iloc[0]
 
 mean = avg_scored + min_osrs - gb_dsrs - hfa/2
+print(f'League average is {avg_scored} points. MIN osrs through week {OBS_WEEK} is {min_osrs}. GB dsrs is {gb_dsrs}.'
+      f'Home field advatnage is {hfa} points, for one side of the ball {hfa/2} points.')
 
 # sigma (std_obs) is the noise in a game *margin*. For a single team's score we need the
 # noise in points scored, estimated from the score-level residuals of the week-9 fit.
@@ -93,7 +95,7 @@ ax.grid(axis='y', alpha=0.25)
 ax.legend(frameon=False, loc='upper right')
 fig.tight_layout()
 
-out_path = DATA_DIR + 'predictions/min_week10_score_distribution.png'
+out_path = 'min_week10_score_distribution.png'
 fig.savefig(out_path, dpi=150)
 print(f'Saved plot to {out_path}')
 plt.show()
