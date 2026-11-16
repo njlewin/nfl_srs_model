@@ -38,9 +38,17 @@ conf_lookup = {t: d.split()[0] for t, d in div_lookup.items()}
 
 VIEWS = ['prior', 'obs', 'post']
 
+# Wild card round matchups by seed (1 seed has a bye); higher seed hosts
+WILD_CARD_GAMES = pd.DataFrame({
+    'round': ['Wild Card'] * 6,
+    'conference': ['AFC', 'AFC', 'AFC', 'NFC', 'NFC', 'NFC'],
+    'home_team_seed': [2, 3, 4, 2, 3, 4],
+    'away_team_seed': [7, 6, 5, 7, 6, 5],
+})
+
 # Directories
 
-DATA_DIR = "../data/"
+DATA_DIR = str(Path(__file__).resolve().parent.parent / "data") + "/"  # works from any working directory
 
 SRS_DIR = DATA_DIR +"srs/"
 SCHEDULE_DIR = DATA_DIR+'schedule/'
